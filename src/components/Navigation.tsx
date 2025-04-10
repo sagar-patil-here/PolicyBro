@@ -20,7 +20,7 @@ import {
   X, 
   Shield, 
   FileText, 
-  Compare, 
+  BarChartHorizontal,
   Leaf 
 } from 'lucide-react';
 
@@ -43,7 +43,7 @@ const Navigation = () => {
   const customerLinks = [
     { name: 'Dashboard', href: '/', icon: <Home className="h-5 w-5" /> },
     { name: 'My Policies', href: '/policies', icon: <FileText className="h-5 w-5" /> },
-    { name: 'Compare', href: '/compare', icon: <Compare className="h-5 w-5" /> },
+    { name: 'Compare', href: '/compare', icon: <BarChartHorizontal className="h-5 w-5" /> },
     { name: 'Eco Rewards', href: '/rewards', icon: <Leaf className="h-5 w-5" /> },
   ];
 

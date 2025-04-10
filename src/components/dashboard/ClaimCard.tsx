@@ -74,8 +74,7 @@ const ClaimCard = ({
               <span className="font-medium">{progressPercentage}%</span>
             </div>
             <Progress value={progressPercentage} 
-              className="h-1.5" 
-              indicatorClassName={status === "denied" ? "bg-red-500" : `bg-insurance-${type}`} />
+              className={`h-1.5 ${status === "denied" ? "bg-red-500" : `bg-insurance-${type}`}`} />
           </div>
         </div>
       </CardContent>

@@ -84,8 +84,7 @@ const PolicyCard = ({
             )}
           </div>
           <Progress value={(100 - (daysUntilRenewal / 365 * 100))} 
-            className="h-1.5" 
-            indicatorClassName={`${daysUntilRenewal < 30 ? 'bg-yellow-500' : 'bg-insurance-' + type}`} />
+            className={`h-1.5 ${daysUntilRenewal < 30 ? 'bg-yellow-500' : `bg-insurance-${type}`}`} />
         </div>
       </CardFooter>
     </Card>

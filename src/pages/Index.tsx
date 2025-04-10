@@ -1,6 +1,8 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 import PolicyCard from "@/components/dashboard/PolicyCard";
 import RecommendationCard from "@/components/dashboard/RecommendationCard";
 import StatCard from "@/components/dashboard/StatCard";
