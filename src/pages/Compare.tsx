@@ -8,6 +8,7 @@ import { Search, CheckCircle2, XCircle, HelpCircle, ArrowRightLeft, Filter, Plus
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import RecommendationCard from "@/components/dashboard/RecommendationCard";
 
 const Compare = () => {
   const [policyType, setPolicyType] = useState("auto");
@@ -20,6 +21,140 @@ const Compare = () => {
     { id: "life", name: "Life Insurance" },
     { id: "travel", name: "Travel Insurance" },
   ];
+
+  // Sample recommendations data for each insurance type
+  const recommendations = {
+    auto: [
+      {
+        title: "Premium Auto Cover",
+        company: "SafeDrive Insurance Co.",
+        premium: 125,
+        savings: 30,
+        reasons: [
+          "Best coverage for your driving profile",
+          "Lower rates based on your safe driving history",
+          "Includes roadside assistance"
+        ],
+        matchPercentage: 92
+      },
+      {
+        title: "Young Driver Protection",
+        company: "ValueDrive Insurance",
+        premium: 145,
+        savings: 15,
+        reasons: [
+          "Tailored for drivers under 30",
+          "Accident forgiveness feature",
+          "Includes new car replacement"
+        ],
+        matchPercentage: 85
+      }
+    ],
+    home: [
+      {
+        title: "Complete Home Shield",
+        company: "HomeSecure Insurance",
+        premium: 95,
+        savings: 25,
+        reasons: [
+          "Full coverage for your property value",
+          "Includes flood and natural disaster protection",
+          "24/7 emergency assistance"
+        ],
+        matchPercentage: 94
+      },
+      {
+        title: "Renter's Ultimate Protection",
+        company: "UrbanCover Inc.",
+        premium: 55,
+        savings: 15,
+        reasons: [
+          "Perfect for urban apartments",
+          "Personal property replacement coverage",
+          "Liability protection included"
+        ],
+        matchPercentage: 89
+      }
+    ],
+    health: [
+      {
+        title: "Family Health Complete",
+        company: "VitalCare Insurance",
+        premium: 340,
+        savings: 75,
+        reasons: [
+          "Comprehensive family coverage",
+          "Low deductibles on common procedures",
+          "Includes dental and vision coverage"
+        ],
+        matchPercentage: 91
+      },
+      {
+        title: "Individual Premium Health",
+        company: "WellBeing Health",
+        premium: 210,
+        savings: 45,
+        reasons: [
+          "Tailored for individual needs",
+          "Large network of specialists",
+          "Mental health coverage included"
+        ],
+        matchPercentage: 87
+      }
+    ],
+    life: [
+      {
+        title: "Term Life Plus",
+        company: "SecureFuture Insurance",
+        premium: 65,
+        savings: 20,
+        reasons: [
+          "20-year term with locked rates",
+          "Higher coverage for lower premiums",
+          "Convertible to permanent policy"
+        ],
+        matchPercentage: 95
+      },
+      {
+        title: "Whole Life Protection",
+        company: "Heritage Life Co.",
+        premium: 120,
+        savings: 0,
+        reasons: [
+          "Lifelong coverage and protection",
+          "Builds cash value over time",
+          "Guaranteed death benefit"
+        ],
+        matchPercentage: 88
+      }
+    ],
+    travel: [
+      {
+        title: "Global Traveler Shield",
+        company: "WorldWide Insurance",
+        premium: 45,
+        savings: 15,
+        reasons: [
+          "Comprehensive international coverage",
+          "Includes emergency medical evacuation",
+          "Trip cancellation protection"
+        ],
+        matchPercentage: 93
+      },
+      {
+        title: "Business Travel Pro",
+        company: "Corporate Shield Inc.",
+        premium: 55,
+        savings: 10,
+        reasons: [
+          "Designed for frequent business travelers",
+          "Equipment and luggage protection",
+          "Travel delay reimbursement"
+        ],
+        matchPercentage: 89
+      }
+    ]
+  };
 
   const policies = {
     auto: [
@@ -82,21 +217,170 @@ const Compare = () => {
       },
     ],
     home: [
-      // Home insurance policies would go here
+      {
+        id: "home1",
+        name: "Essential Home Protection",
+        company: "HomeSecure Insurance",
+        premium: 85,
+        coverage: 350000,
+        deductible: 1000,
+        benefits: [
+          { id: "hb1", name: "Dwelling Coverage", included: true },
+          { id: "hb2", name: "Personal Property", included: true },
+          { id: "hb3", name: "Liability Protection", included: true },
+          { id: "hb4", name: "Additional Living Expenses", included: true },
+          { id: "hb5", name: "Water Damage", included: false },
+          { id: "hb6", name: "Jewelry Protection", included: false },
+          { id: "hb7", name: "Flood Insurance", included: false },
+        ],
+        rating: 4.2,
+        reviewCount: 189,
+      },
+      {
+        id: "home2",
+        name: "Premium Home Shield",
+        company: "FamilyGuard Home Insurance",
+        premium: 120,
+        coverage: 500000,
+        deductible: 750,
+        benefits: [
+          { id: "hb1", name: "Dwelling Coverage", included: true },
+          { id: "hb2", name: "Personal Property", included: true },
+          { id: "hb3", name: "Liability Protection", included: true },
+          { id: "hb4", name: "Additional Living Expenses", included: true },
+          { id: "hb5", name: "Water Damage", included: true },
+          { id: "hb6", name: "Jewelry Protection", included: true },
+          { id: "hb7", name: "Flood Insurance", included: false },
+        ],
+        rating: 4.7,
+        reviewCount: 256,
+      }
     ],
     health: [
-      // Health insurance policies would go here
+      {
+        id: "health1",
+        name: "Basic Health Plan",
+        company: "VitalCare Insurance",
+        premium: 210,
+        coverage: "80% after deductible",
+        deductible: 2500,
+        benefits: [
+          { id: "med1", name: "Primary Care Visits", included: true },
+          { id: "med2", name: "Specialist Visits", included: true },
+          { id: "med3", name: "Prescription Coverage", included: true },
+          { id: "med4", name: "Hospitalization", included: true },
+          { id: "med5", name: "Dental Coverage", included: false },
+          { id: "med6", name: "Vision Coverage", included: false },
+          { id: "med7", name: "Mental Health", included: false },
+        ],
+        rating: 3.9,
+        reviewCount: 312,
+      },
+      {
+        id: "health2",
+        name: "Premium Health Coverage",
+        company: "WellBeing Health",
+        premium: 340,
+        coverage: "90% after deductible",
+        deductible: 1500,
+        benefits: [
+          { id: "med1", name: "Primary Care Visits", included: true },
+          { id: "med2", name: "Specialist Visits", included: true },
+          { id: "med3", name: "Prescription Coverage", included: true },
+          { id: "med4", name: "Hospitalization", included: true },
+          { id: "med5", name: "Dental Coverage", included: true },
+          { id: "med6", name: "Vision Coverage", included: true },
+          { id: "med7", name: "Mental Health", included: true },
+        ],
+        rating: 4.6,
+        reviewCount: 289,
+      }
     ],
     life: [
-      // Life insurance policies would go here
+      {
+        id: "life1",
+        name: "Term Life Basic",
+        company: "SecureFuture Insurance",
+        premium: 45,
+        coverage: 250000,
+        deductible: 0,
+        benefits: [
+          { id: "life1", name: "Death Benefit", included: true },
+          { id: "life2", name: "Level Premium", included: true },
+          { id: "life3", name: "Convertible Option", included: true },
+          { id: "life4", name: "Accelerated Benefits", included: false },
+          { id: "life5", name: "Cash Value", included: false },
+          { id: "life6", name: "Dividend Payments", included: false },
+          { id: "life7", name: "Rider Options", included: false },
+        ],
+        rating: 4.1,
+        reviewCount: 156,
+      },
+      {
+        id: "life2",
+        name: "Whole Life Protection",
+        company: "Heritage Life Co.",
+        premium: 120,
+        coverage: 500000,
+        deductible: 0,
+        benefits: [
+          { id: "life1", name: "Death Benefit", included: true },
+          { id: "life2", name: "Level Premium", included: true },
+          { id: "life3", name: "Convertible Option", included: false },
+          { id: "life4", name: "Accelerated Benefits", included: true },
+          { id: "life5", name: "Cash Value", included: true },
+          { id: "life6", name: "Dividend Payments", included: true },
+          { id: "life7", name: "Rider Options", included: true },
+        ],
+        rating: 4.5,
+        reviewCount: 203,
+      }
     ],
     travel: [
-      // Travel insurance policies would go here
+      {
+        id: "travel1",
+        name: "Basic Travel Insurance",
+        company: "WorldWide Insurance",
+        premium: 35,
+        coverage: 50000,
+        deductible: 250,
+        benefits: [
+          { id: "t1", name: "Emergency Medical", included: true },
+          { id: "t2", name: "Trip Cancellation", included: true },
+          { id: "t3", name: "Lost Luggage", included: true },
+          { id: "t4", name: "Travel Delay", included: false },
+          { id: "t5", name: "Adventure Activities", included: false },
+          { id: "t6", name: "Rental Car Coverage", included: false },
+          { id: "t7", name: "24/7 Assistance", included: true },
+        ],
+        rating: 4.0,
+        reviewCount: 142,
+      },
+      {
+        id: "travel2",
+        name: "Premium Travel Protection",
+        company: "Global Travelers Inc.",
+        premium: 65,
+        coverage: 100000,
+        deductible: 100,
+        benefits: [
+          { id: "t1", name: "Emergency Medical", included: true },
+          { id: "t2", name: "Trip Cancellation", included: true },
+          { id: "t3", name: "Lost Luggage", included: true },
+          { id: "t4", name: "Travel Delay", included: true },
+          { id: "t5", name: "Adventure Activities", included: true },
+          { id: "t6", name: "Rental Car Coverage", included: true },
+          { id: "t7", name: "24/7 Assistance", included: true },
+        ],
+        rating: 4.8,
+        reviewCount: 219,
+      }
     ],
   };
 
   const availablePolicies = policies[policyType as keyof typeof policies] || [];
   const selectedPolicyData = availablePolicies.filter(policy => selectedPolicies.includes(policy.id));
+  const currentRecommendations = recommendations[policyType as keyof typeof recommendations] || [];
 
   const handleAddPolicy = (policyId: string) => {
     if (selectedPolicies.length < 3) {
@@ -131,6 +415,29 @@ const Compare = () => {
           </p>
         </div>
       </div>
+
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Personalized Recommendations</CardTitle>
+          <CardDescription>Insurance policies tailored to your profile and needs</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {currentRecommendations.map((recommendation, index) => (
+              <RecommendationCard
+                key={index}
+                type={policyType as "auto" | "home" | "life" | "health" | "travel"}
+                title={recommendation.title}
+                company={recommendation.company}
+                premium={recommendation.premium}
+                savings={recommendation.savings}
+                reasons={recommendation.reasons}
+                matchPercentage={recommendation.matchPercentage}
+              />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="mb-8">
         <CardHeader>
@@ -216,7 +523,11 @@ const Compare = () => {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Coverage</span>
-                      <span className="font-medium">${policy.coverage.toLocaleString()}</span>
+                      <span className="font-medium">
+                        {typeof policy.coverage === 'number' ? 
+                          `$${policy.coverage.toLocaleString()}` : 
+                          policy.coverage}
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Deductible</span>
@@ -296,7 +607,9 @@ const Compare = () => {
               </div>
               {selectedPolicyData.map((policy) => (
                 <div key={policy.id} className="border-b border-l p-4 text-center font-medium">
-                  ${policy.coverage.toLocaleString()}
+                  {typeof policy.coverage === 'number' ? 
+                    `$${policy.coverage.toLocaleString()}` : 
+                    policy.coverage}
                 </div>
               ))}
               
