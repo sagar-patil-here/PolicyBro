@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -15,7 +14,6 @@ import { toast } from "sonner";
 const Index = () => {
   const [loading, setLoading] = useState(true);
 
-  // Simulate loading
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
@@ -271,7 +269,7 @@ const Index = () => {
                       </div>
                       <span className="text-sm font-bold">Medium</span>
                     </div>
-                    <Progress value={35} className="h-2 bg-muted" indicatorClassName="bg-orange-500" />
+                    <Progress value={35} className="h-2 bg-muted bg-orange-500" />
                     <ul className="space-y-2 text-sm mt-4">
                       <li className="flex justify-between">
                         <span className="text-muted-foreground">Flood Risk</span>
