@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { UserProfile } from '@/api/types';
 import { useUserProfile } from '@/contexts/UserProfileContext';
@@ -47,7 +48,7 @@ const UserProfileForm = () => {
       setProfile((prev) => ({
         ...prev,
         [parent]: {
-          ...prev[parent as keyof UserProfile],
+          ...(prev[parent as keyof UserProfile] as Record<string, any>),
           [child]: type === 'checkbox' ? checked : value
         }
       }));
