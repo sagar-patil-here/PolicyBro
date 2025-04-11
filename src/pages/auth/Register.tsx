@@ -6,43 +6,54 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
+import { Shield, Mail, Lock, User, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
-const Login = () => {
+const Register = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [userType, setUserType] = useState("customer");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { register } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate passwords match
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    
+    // Validate password strength (basic validation)
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+    
     setIsLoading(true);
-
+    
     try {
-      // Use the auth context login function
-      const response = await login({ email, password });
+      const response = await register({
+        name,
+        email,
+        password,
+        userType: userType as 'customer' | 'company' | 'admin'
+      });
       
       if (response.success) {
         toast.success(response.message);
-        
-        // Navigate based on user type
-        if (response.user?.userType === "customer") {
-          navigate("/");
-        } else if (response.user?.userType === "company") {
-          navigate("/company");
-        } else if (response.user?.userType === "admin") {
-          navigate("/admin");
-        }
+        navigate("/login");
       } else {
         toast.error(response.message);
       }
     } catch (error) {
-      toast.error("An error occurred while logging in");
-      console.error("Login error:", error);
+      toast.error("An error occurred during registration");
+      console.error("Registration error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -57,7 +68,7 @@ const Login = () => {
           </div>
           <h1 className="text-2xl font-bold tracking-tight">PolicyCompass</h1>
           <p className="text-sm text-muted-foreground max-w-xs mt-2">
-            Your comprehensive insurance management platform
+            Create your account to get started
           </p>
         </div>
 
@@ -68,37 +79,49 @@ const Login = () => {
             <TabsTrigger value="admin">Admin</TabsTrigger>
           </TabsList>
           <TabsContent value="customer">
-            <LoginForm 
-              title="Customer Login"
-              description="Access your insurance portfolio"
+            <RegisterForm 
+              title="Customer Registration"
+              description="Create your customer account"
+              name={name}
+              setName={setName}
               email={email}
               setEmail={setEmail}
               password={password}
               setPassword={setPassword}
+              confirmPassword={confirmPassword}
+              setConfirmPassword={setConfirmPassword}
               handleSubmit={handleSubmit}
               isLoading={isLoading}
             />
           </TabsContent>
           <TabsContent value="company">
-            <LoginForm 
-              title="Company Login"
-              description="Access your company dashboard"
+            <RegisterForm 
+              title="Company Registration"
+              description="Create your company account"
+              name={name}
+              setName={setName}
               email={email}
               setEmail={setEmail}
               password={password}
               setPassword={setPassword}
+              confirmPassword={confirmPassword}
+              setConfirmPassword={setConfirmPassword}
               handleSubmit={handleSubmit}
               isLoading={isLoading}
             />
           </TabsContent>
           <TabsContent value="admin">
-            <LoginForm 
-              title="Admin Login"
-              description="System administration access"
+            <RegisterForm 
+              title="Admin Registration"
+              description="Create administrator account"
+              name={name}
+              setName={setName}
               email={email}
               setEmail={setEmail}
               password={password}
               setPassword={setPassword}
+              confirmPassword={confirmPassword}
+              setConfirmPassword={setConfirmPassword}
               handleSubmit={handleSubmit}
               isLoading={isLoading}
             />
@@ -109,27 +132,35 @@ const Login = () => {
   );
 };
 
-interface LoginFormProps {
+interface RegisterFormProps {
   title: string;
   description: string;
+  name: string;
+  setName: (name: string) => void;
   email: string;
   setEmail: (email: string) => void;
   password: string;
   setPassword: (password: string) => void;
+  confirmPassword: string;
+  setConfirmPassword: (confirmPassword: string) => void;
   handleSubmit: (e: React.FormEvent) => void;
   isLoading: boolean;
 }
 
-const LoginForm = ({ 
+const RegisterForm = ({ 
   title, 
   description, 
+  name,
+  setName,
   email, 
   setEmail, 
   password, 
-  setPassword, 
+  setPassword,
+  confirmPassword,
+  setConfirmPassword, 
   handleSubmit, 
   isLoading 
-}: LoginFormProps) => {
+}: RegisterFormProps) => {
   return (
     <Card>
       <CardHeader>
@@ -138,6 +169,22 @@ const LoginForm = ({
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Full Name</Label>
+            <div className="relative">
+              <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="name"
+                placeholder="John Doe"
+                type="text"
+                className="pl-9"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+          
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <div className="relative">
@@ -153,13 +200,9 @@ const LoginForm = ({
               />
             </div>
           </div>
+          
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
-              <Link to="/reset-password" className="text-xs text-primary hover:underline">
-                Forgot password?
-              </Link>
-            </div>
+            <Label htmlFor="password">Password</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -172,25 +215,40 @@ const LoginForm = ({
               />
             </div>
           </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="confirmPassword"
+                type="password"
+                className="pl-9"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
+          </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Logging in...
+                Registering...
               </>
             ) : (
               <>
-                Login
+                Register
                 <ArrowRight className="ml-2 h-4 w-4" />
               </>
             )}
           </Button>
           <div className="text-center text-sm text-muted-foreground">
-            Don't have an account?{" "}
-            <Link to="/register" className="text-primary font-medium hover:underline">
-              Register
+            Already have an account?{" "}
+            <Link to="/login" className="text-primary font-medium hover:underline">
+              Login
             </Link>
           </div>
         </CardFooter>
@@ -199,4 +257,4 @@ const LoginForm = ({
   );
 };
 
-export default Login;
+export default Register;

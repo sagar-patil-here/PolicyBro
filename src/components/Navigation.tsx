@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
@@ -22,26 +23,33 @@ import {
   BarChartHorizontal,
   Leaf,
   User,
-  Brain
+  Brain,
+  LogIn
 } from 'lucide-react';
 import { useUserProfile } from '@/contexts/UserProfileContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { pathname } = useLocation();
   const [userType, setUserType] = useState<'customer' | 'company' | 'admin'>('customer');
   const { userProfile } = useUserProfile();
+  const { isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
   
-  // Determine user type based on URL path
+  // Determine user type based on authenticated user or URL path
   useEffect(() => {
-    if (pathname.includes('admin')) {
+    if (user) {
+      setUserType(user.userType);
+    } else if (pathname.includes('admin')) {
       setUserType('admin');
     } else if (pathname.includes('company')) {
       setUserType('company');
     } else {
       setUserType('customer');
     }
-  }, [pathname]);
+  }, [pathname, user]);
 
   const customerLinks = [
     { name: 'Dashboard', href: '/', icon: <Home className="h-5 w-5" /> },
@@ -69,6 +77,12 @@ const Navigation = () => {
   const links = userType === 'admin' ? adminLinks : userType === 'company' ? companyLinks : customerLinks;
 
   const toggleMenu = () => setIsOpen(!isOpen);
+  
+  const handleLogout = async () => {
+    await logout();
+    toast.success("Logged out successfully");
+    navigate('/login');
+  };
 
   return (
     <nav className="fixed top-0 w-full bg-background border-b z-50">
@@ -102,59 +116,64 @@ const Navigation = () => {
               {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Avatar className="cursor-pointer">
-                  <AvatarImage src="" />
-                  <AvatarFallback className="bg-primary text-primary-foreground">
-                    {userProfile ? userProfile.name.substring(0, 2).toUpperCase() : userType === 'admin' ? 'AD' : userType === 'company' ? 'CO' : 'JD'}
-                  </AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>
-                  {userProfile ? userProfile.name : userType === 'admin' ? 'Admin Account' : userType === 'company' ? 'Company Account' : 'John Doe'}
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link to="/profile" className="flex w-full cursor-pointer">
-                    <User className="w-4 h-4 mr-2" />
-                    <span>Profile</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/settings" className="flex w-full cursor-pointer">
-                    <Settings className="w-4 h-4 mr-2" />
-                    <span>Settings</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  {userType === 'admin' ? (
-                    <Link to="/" className="flex w-full cursor-pointer">
-                      <Home className="w-4 h-4 mr-2" />
-                      <span>Customer View</span>
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Avatar className="cursor-pointer">
+                    <AvatarImage src="" />
+                    <AvatarFallback className="bg-primary text-primary-foreground">
+                      {user ? user.name.substring(0, 2).toUpperCase() : userProfile ? userProfile.name.substring(0, 2).toUpperCase() : userType === 'admin' ? 'AD' : userType === 'company' ? 'CO' : 'JD'}
+                    </AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>
+                    {user ? user.name : userProfile ? userProfile.name : userType === 'admin' ? 'Admin Account' : userType === 'company' ? 'Company Account' : 'John Doe'}
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="flex w-full cursor-pointer">
+                      <User className="w-4 h-4 mr-2" />
+                      <span>Profile</span>
                     </Link>
-                  ) : userType === 'company' ? (
-                    <Link to="/" className="flex w-full cursor-pointer">
-                      <Home className="w-4 h-4 mr-2" />
-                      <span>Customer View</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings" className="flex w-full cursor-pointer">
+                      <Settings className="w-4 h-4 mr-2" />
+                      <span>Settings</span>
                     </Link>
-                  ) : (
-                    <Link to="/admin" className="flex w-full cursor-pointer">
-                      <Shield className="w-4 h-4 mr-2" />
-                      <span>Admin Panel</span>
-                    </Link>
-                  )}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link to="/login" className="flex w-full cursor-pointer text-destructive">
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    {userType === 'admin' ? (
+                      <Link to="/" className="flex w-full cursor-pointer">
+                        <Home className="w-4 h-4 mr-2" />
+                        <span>Customer View</span>
+                      </Link>
+                    ) : userType === 'company' ? (
+                      <Link to="/" className="flex w-full cursor-pointer">
+                        <Home className="w-4 h-4 mr-2" />
+                        <span>Customer View</span>
+                      </Link>
+                    ) : (
+                      <Link to="/admin" className="flex w-full cursor-pointer">
+                        <Shield className="w-4 h-4 mr-2" />
+                        <span>Admin Panel</span>
+                      </Link>
+                    )}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="text-destructive cursor-pointer">
                     <LogOut className="w-4 h-4 mr-2" />
                     <span>Log out</span>
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button variant="outline" size="sm" onClick={() => navigate('/login')}>
+                <LogIn className="w-4 h-4 mr-2" />
+                Login
+              </Button>
+            )}
           </div>
         </div>
       </div>

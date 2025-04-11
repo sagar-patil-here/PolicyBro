@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { UserProfile } from '@/api/types';
 import { useUserProfile } from '@/contexts/UserProfileContext';
@@ -15,7 +14,7 @@ import { toast } from 'sonner';
 const UserProfileForm = () => {
   const { userProfile: existingProfile, saveProfile } = useUserProfile();
   
-  const [profile, setProfile] = useState<UserProfile>(existingProfile || {
+  const defaultProfile: UserProfile = {
     name: '',
     email: '',
     age: 30,
@@ -34,7 +33,9 @@ const UserProfileForm = () => {
       state: '',
       zipCode: '',
     }
-  });
+  };
+  
+  const [profile, setProfile] = useState<UserProfile>(existingProfile || defaultProfile);
 
   const [healthCondition, setHealthCondition] = useState('');
   
