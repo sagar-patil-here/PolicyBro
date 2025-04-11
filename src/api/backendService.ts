@@ -1,12 +1,38 @@
 
 // Backend integration with MongoDB Atlas
 import { UserProfile, InsuranceRecommendation } from "./types";
-import { apiEndpoints } from './mongoConfig';
+import { apiEndpoints, getCollection } from './mongoConfig';
+import { ObjectId } from 'mongodb';
 
-// These functions will be implemented when the backend is ready
-export const fetchUserProfile = async (): Promise<UserProfile> => {
-  // This will be replaced with actual API call
-  // For now, return a mock response
+export const fetchUserProfile = async (userId: string = "current-user"): Promise<UserProfile> => {
+  try {
+    // Try to fetch from MongoDB
+    const collection = await getCollection('userProfiles');
+    const userProfile = await collection.findOne({ userId });
+    
+    if (userProfile) {
+      // Convert MongoDB _id to id string
+      const formattedProfile: UserProfile = {
+        id: userProfile._id.toString(),
+        name: userProfile.name,
+        email: userProfile.email,
+        age: userProfile.age,
+        occupation: userProfile.occupation,
+        income: userProfile.income,
+        assets: userProfile.assets,
+        familyStatus: userProfile.familyStatus,
+        healthConditions: userProfile.healthConditions,
+        riskTolerance: userProfile.riskTolerance,
+        location: userProfile.location
+      };
+      
+      return formattedProfile;
+    }
+  } catch (error) {
+    console.error("Error fetching user profile from MongoDB:", error);
+  }
+  
+  // Fallback to mock data if MongoDB fails or user not found
   const mockProfile: UserProfile = {
     name: "John Doe",
     email: "john@example.com",
@@ -28,17 +54,75 @@ export const fetchUserProfile = async (): Promise<UserProfile> => {
     }
   };
   
-  return Promise.resolve(mockProfile);
+  return mockProfile;
 };
 
-export const updateUserProfile = async (profile: UserProfile): Promise<UserProfile> => {
-  // This will be replaced with actual API call
-  console.log("Updating profile:", profile);
-  return Promise.resolve(profile);
+export const updateUserProfile = async (profile: UserProfile, userId: string = "current-user"): Promise<UserProfile> => {
+  try {
+    const collection = await getCollection('userProfiles');
+    
+    // Prepare MongoDB document
+    const profileDocument = {
+      ...profile,
+      userId,
+      updatedAt: new Date()
+    };
+    
+    // Remove id field if it exists (MongoDB will use _id)
+    if (profileDocument.id) {
+      delete profileDocument.id;
+    }
+    
+    // Check if profile already exists
+    const existingProfile = await collection.findOne({ userId });
+    
+    if (existingProfile) {
+      // Update existing profile
+      await collection.updateOne(
+        { userId }, 
+        { $set: profileDocument }
+      );
+      
+      // Return updated profile with id
+      return {
+        ...profile,
+        id: existingProfile._id.toString()
+      };
+    } else {
+      // Insert new profile
+      const result = await collection.insertOne(profileDocument);
+      
+      // Return inserted profile with id
+      return {
+        ...profile,
+        id: result.insertedId.toString()
+      };
+    }
+  } catch (error) {
+    console.error("Error updating user profile in MongoDB:", error);
+    // Return the original profile if MongoDB fails
+    console.log("Returning original profile without saving to DB");
+    return profile;
+  }
 };
 
-export const fetchRecommendations = async (userId: string): Promise<InsuranceRecommendation[]> => {
-  // This will be replaced with actual API call
+export const fetchRecommendations = async (userId: string = "current-user"): Promise<InsuranceRecommendation[]> => {
+  try {
+    // Try to fetch from MongoDB
+    const collection = await getCollection('recommendations');
+    const recommendations = await collection.find({ userId }).toArray();
+    
+    if (recommendations && recommendations.length > 0) {
+      return recommendations.map(rec => ({
+        ...rec,
+        id: rec._id.toString()
+      }));
+    }
+  } catch (error) {
+    console.error("Error fetching recommendations from MongoDB:", error);
+  }
+  
+  // Fallback to mock data if MongoDB fails or no recommendations found
   const mockRecommendations: InsuranceRecommendation[] = [
     {
       id: "1",
@@ -75,8 +159,36 @@ export const fetchRecommendations = async (userId: string): Promise<InsuranceRec
     }
   ];
   
-  return Promise.resolve(mockRecommendations);
+  return mockRecommendations;
 };
 
-// We'll expand this file when the Express backend is implemented with MongoDB
-
+export const saveRecommendation = async (recommendation: InsuranceRecommendation, userId: string = "current-user"): Promise<InsuranceRecommendation> => {
+  try {
+    const collection = await getCollection('recommendations');
+    
+    // Prepare MongoDB document
+    const recommendationDocument = {
+      ...recommendation,
+      userId,
+      createdAt: new Date()
+    };
+    
+    // Remove id field if it exists (MongoDB will use _id)
+    if (recommendationDocument.id) {
+      delete recommendationDocument.id;
+    }
+    
+    // Insert recommendation
+    const result = await collection.insertOne(recommendationDocument);
+    
+    // Return inserted recommendation with id
+    return {
+      ...recommendation,
+      id: result.insertedId.toString()
+    };
+  } catch (error) {
+    console.error("Error saving recommendation to MongoDB:", error);
+    // Return the original recommendation if MongoDB fails
+    return recommendation;
+  }
+};

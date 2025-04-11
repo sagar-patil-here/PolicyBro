@@ -27,3 +27,31 @@ export const apiEndpoints = {
   createClaim: `${API_BASE_URL}/claims`,
   updateClaim: (id: string) => `${API_BASE_URL}/claims/${id}`,
 };
+
+// Direct connection to MongoDB for development
+// In production, this would be handled by the backend server
+import { MongoClient } from 'mongodb';
+
+let client: MongoClient | null = null;
+
+export const getMongoClient = async () => {
+  if (!client) {
+    try {
+      // Replace <db_password> with your actual password
+      const uri = MONGODB_URI.replace('<db_password>', 'your_actual_password_here');
+      client = new MongoClient(uri);
+      await client.connect();
+      console.log('Connected to MongoDB Atlas');
+    } catch (error) {
+      console.error('Failed to connect to MongoDB:', error);
+      throw error;
+    }
+  }
+  return client;
+};
+
+export const getCollection = async (collectionName: string) => {
+  const client = await getMongoClient();
+  const db = client.db('policypro');
+  return db.collection(collectionName);
+};
