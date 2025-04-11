@@ -1,6 +1,6 @@
 
 // MongoDB Atlas Configuration
-export const MONGODB_URI = 'mongodb+srv://sagarpatil22112004:<db_password>@policypro.r9vaghj.mongodb.net/?retryWrites=true&w=majority&appName=policypro';
+export const MONGODB_URI = 'mongodb+srv://sagarpatil22112004:lMzPN4fIuiQTBfcv@policypro.r9vaghj.mongodb.net/?retryWrites=true&w=majority&appName=policypro';
 
 // API endpoints for the Express server
 export const API_BASE_URL = 'http://localhost:5000/api';
@@ -37,9 +37,8 @@ let client: MongoClient | null = null;
 export const getMongoClient = async () => {
   if (!client) {
     try {
-      // Replace <db_password> with your actual password
-      const uri = MONGODB_URI.replace('<db_password>', 'your_actual_password_here');
-      client = new MongoClient(uri);
+      // Using the actual password provided by the user
+      client = new MongoClient(MONGODB_URI);
       await client.connect();
       console.log('Connected to MongoDB Atlas');
     } catch (error) {

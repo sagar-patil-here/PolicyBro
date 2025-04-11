@@ -113,10 +113,18 @@ export const fetchRecommendations = async (userId: string = "current-user"): Pro
     const recommendations = await collection.find({ userId }).toArray();
     
     if (recommendations && recommendations.length > 0) {
+      // Properly map MongoDB documents to InsuranceRecommendation type
       return recommendations.map(rec => ({
-        ...rec,
-        id: rec._id.toString()
-      }));
+        id: rec._id.toString(),
+        type: rec.type,
+        title: rec.title,
+        company: rec.company,
+        premium: rec.premium,
+        coverage: rec.coverage,
+        matchScore: rec.matchScore,
+        keyFeatures: rec.keyFeatures,
+        relevantFactors: rec.relevantFactors
+      })) as InsuranceRecommendation[];
     }
   } catch (error) {
     console.error("Error fetching recommendations from MongoDB:", error);
