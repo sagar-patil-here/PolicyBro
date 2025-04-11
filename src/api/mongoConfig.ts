@@ -1,4 +1,3 @@
-
 // MongoDB Atlas Configuration
 export const MONGODB_URI = 'mongodb+srv://sagarpatil22112004:lMzPN4fIuiQTBfcv@policypro.r9vaghj.mongodb.net/?retryWrites=true&w=majority&appName=policypro';
 
@@ -33,16 +32,25 @@ export const apiEndpoints = {
 import { MongoClient } from 'mongodb';
 
 let client: MongoClient | null = null;
+let connectionError: Error | null = null;
 
 export const getMongoClient = async () => {
+  // If we've already tried to connect and failed, don't keep trying
+  if (connectionError) {
+    console.warn('Using fallback data due to previous MongoDB connection failure');
+    throw connectionError;
+  }
+  
   if (!client) {
     try {
-      // Using the actual password provided by the user
+      console.log('Attempting to connect to MongoDB Atlas...');
       client = new MongoClient(MONGODB_URI);
       await client.connect();
-      console.log('Connected to MongoDB Atlas');
+      console.log('Successfully connected to MongoDB Atlas');
     } catch (error) {
+      connectionError = error as Error;
       console.error('Failed to connect to MongoDB:', error);
+      console.log('Will use fallback data instead');
       throw error;
     }
   }
@@ -50,7 +58,12 @@ export const getMongoClient = async () => {
 };
 
 export const getCollection = async (collectionName: string) => {
-  const client = await getMongoClient();
-  const db = client.db('policypro');
-  return db.collection(collectionName);
+  try {
+    const client = await getMongoClient();
+    const db = client.db('policypro');
+    return db.collection(collectionName);
+  } catch (error) {
+    console.error(`Failed to get collection ${collectionName}:`, error);
+    throw error;
+  }
 };

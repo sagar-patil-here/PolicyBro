@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { UserProfile, InsuranceRecommendation } from '../api/types';
 import { getAIRecommendations } from '../services/aiRecommendationService';
@@ -16,10 +15,10 @@ interface UserProfileContextType {
 }
 
 const defaultUserProfile: UserProfile = {
-  name: '',
-  email: '',
+  name: 'Guest User',
+  email: 'guest@example.com',
   age: 30,
-  occupation: '',
+  occupation: 'Professional',
   income: 70000,
   assets: {
     home: false,
@@ -30,9 +29,9 @@ const defaultUserProfile: UserProfile = {
   healthConditions: [],
   riskTolerance: 'medium',
   location: {
-    city: '',
-    state: '',
-    zipCode: '',
+    city: 'New York',
+    state: 'New York',
+    zipCode: '10001',
   }
 };
 
@@ -59,13 +58,17 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
     const loadUserProfile = async () => {
       try {
         setIsLoadingProfile(true);
+        console.log("Attempting to load user profile...");
         const profile = await fetchUserProfile();
         setUserProfile(profile);
         console.log("Loaded user profile:", profile);
       } catch (error) {
         console.error("Failed to load user profile:", error);
-        toast.error("Failed to load profile. Using default values.");
+        // Set default profile instead of keeping loading state
+        setUserProfile(defaultUserProfile);
+        toast.error("Failed to load profile from database. Using default values.");
       } finally {
+        // Always set loading to false, even if there's an error
         setIsLoadingProfile(false);
       }
     };
@@ -80,15 +83,16 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
       toast.success('Profile saved successfully!');
     } catch (error) {
       console.error('Failed to save profile:', error);
-      toast.error('Failed to save profile. Please try again.');
+      toast.error('Failed to save profile to database. Data saved locally only.');
       // Still update UI state to show user their changes
       setUserProfile(profile);
     }
   };
 
   const clearProfile = () => {
-    setUserProfile(null);
+    setUserProfile(defaultUserProfile);
     setRecommendations([]);
+    toast.info('Profile reset to defaults');
   };
 
   const generateRecommendations = async () => {
@@ -101,12 +105,19 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
       setIsLoadingRecommendations(true);
       const aiRecommendations = await getAIRecommendations(userProfile);
       
-      // Save recommendations to MongoDB
-      const savedRecommendations = await Promise.all(
-        aiRecommendations.map(recommendation => saveRecommendation(recommendation))
-      );
+      // Try to save recommendations to MongoDB
+      try {
+        const savedRecommendations = await Promise.all(
+          aiRecommendations.map(recommendation => saveRecommendation(recommendation))
+        );
+        setRecommendations(savedRecommendations);
+      } catch (error) {
+        // If MongoDB fails, still show recommendations
+        console.error('Failed to save recommendations to database:', error);
+        setRecommendations(aiRecommendations);
+        toast.warning('Generated recommendations but failed to save to database');
+      }
       
-      setRecommendations(savedRecommendations);
       toast.success('AI recommendations generated successfully!');
     } catch (error) {
       console.error('Failed to generate recommendations:', error);
