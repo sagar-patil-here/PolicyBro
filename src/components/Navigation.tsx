@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -21,13 +20,17 @@ import {
   Shield, 
   FileText, 
   BarChartHorizontal,
-  Leaf 
+  Leaf,
+  User,
+  Brain
 } from 'lucide-react';
+import { useUserProfile } from '@/contexts/UserProfileContext';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { pathname } = useLocation();
   const [userType, setUserType] = useState<'customer' | 'company' | 'admin'>('customer');
+  const { userProfile } = useUserProfile();
   
   // Determine user type based on URL path
   useEffect(() => {
@@ -45,6 +48,8 @@ const Navigation = () => {
     { name: 'My Policies', href: '/policies', icon: <FileText className="h-5 w-5" /> },
     { name: 'Compare', href: '/compare', icon: <BarChartHorizontal className="h-5 w-5" /> },
     { name: 'Eco Rewards', href: '/rewards', icon: <Leaf className="h-5 w-5" /> },
+    { name: 'Profile', href: '/profile', icon: <User className="h-5 w-5" /> },
+    { name: 'AI Recommendations', href: '/recommendations', icon: <Brain className="h-5 w-5" /> },
   ];
 
   const companyLinks = [
@@ -102,15 +107,21 @@ const Navigation = () => {
                 <Avatar className="cursor-pointer">
                   <AvatarImage src="" />
                   <AvatarFallback className="bg-primary text-primary-foreground">
-                    {userType === 'admin' ? 'AD' : userType === 'company' ? 'CO' : 'JD'}
+                    {userProfile ? userProfile.name.substring(0, 2).toUpperCase() : userType === 'admin' ? 'AD' : userType === 'company' ? 'CO' : 'JD'}
                   </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>
-                  {userType === 'admin' ? 'Admin Account' : userType === 'company' ? 'Company Account' : 'John Doe'}
+                  {userProfile ? userProfile.name : userType === 'admin' ? 'Admin Account' : userType === 'company' ? 'Company Account' : 'John Doe'}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="flex w-full cursor-pointer">
+                    <User className="w-4 h-4 mr-2" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/settings" className="flex w-full cursor-pointer">
                     <Settings className="w-4 h-4 mr-2" />

@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import PolicyCard from "@/components/dashboard/PolicyCard";
 import RecommendationCard from "@/components/dashboard/RecommendationCard";
+import AIRecommendButton from "@/components/dashboard/AIRecommendButton";
 import StatCard from "@/components/dashboard/StatCard";
 import ClaimCard from "@/components/dashboard/ClaimCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -197,6 +198,8 @@ const Index = () => {
         </div>
 
         <div className="space-y-6">
+          <AIRecommendButton />
+
           <Card>
             <CardHeader>
               <CardTitle>AI Recommendations</CardTitle>
