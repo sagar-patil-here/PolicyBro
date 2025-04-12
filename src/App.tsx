@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProfileProvider } from "./contexts/UserProfileContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import Layout from "./components/Layout";
+import Home from "./pages/Home";
 import Index from "./pages/Index";
 import Policies from "./pages/Policies";
 import Compare from "./pages/Compare";
@@ -35,7 +36,8 @@ const App = () => (
               <Route path="/register" element={<Register />} />
 
               {/* Customer Routes */}
-              <Route path="/" element={<Layout><Index /></Layout>} />
+              <Route path="/" element={<Layout><Home /></Layout>} />
+              <Route path="/dashboard" element={<Layout><Index /></Layout>} />
               <Route path="/policies" element={<Layout><Policies /></Layout>} />
               <Route path="/compare" element={<Layout><Compare /></Layout>} />
               <Route path="/rewards" element={<Layout><Rewards /></Layout>} />

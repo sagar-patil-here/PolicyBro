@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -24,7 +23,8 @@ import {
   Leaf,
   User,
   Brain,
-  LogIn
+  LogIn,
+  LayoutDashboard
 } from 'lucide-react';
 import { useUserProfile } from '@/contexts/UserProfileContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -52,7 +52,8 @@ const Navigation = () => {
   }, [pathname, user]);
 
   const customerLinks = [
-    { name: 'Dashboard', href: '/', icon: <Home className="h-5 w-5" /> },
+    { name: 'Home', href: '/', icon: <Home className="h-5 w-5" /> },
+    { name: 'Dashboard', href: '/dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
     { name: 'My Policies', href: '/policies', icon: <FileText className="h-5 w-5" /> },
     { name: 'Compare', href: '/compare', icon: <BarChartHorizontal className="h-5 w-5" /> },
     { name: 'Eco Rewards', href: '/rewards', icon: <Leaf className="h-5 w-5" /> },
